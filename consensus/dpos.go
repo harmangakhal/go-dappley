@@ -24,11 +24,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/golang-lru"
-	logger "github.com/sirupsen/logrus"
-
 	"github.com/dappley/go-dappley/core"
 	"github.com/dappley/go-dappley/crypto/keystore/secp256k1"
+	"github.com/hashicorp/golang-lru"
+	logger "github.com/sirupsen/logrus"
 )
 
 type DPOS struct {
@@ -62,7 +61,7 @@ func (dpos *DPOS) GetSlot() *lru.Cache {
 }
 
 func (dpos *DPOS) AddBlockToSlot(block *core.Block) {
-	dpos.slot.Add(int(block.GetTimestamp() / int64(dpos.GetDynasty().timeBetweenBlk)), block)
+	dpos.slot.Add(int(block.GetTimestamp()/int64(dpos.GetDynasty().timeBetweenBlk)), block)
 }
 
 func (dpos *DPOS) Setup(node core.NetService, cbAddr string) {
@@ -104,8 +103,8 @@ func (dpos *DPOS) Validate(block *core.Block) bool {
 		return false
 	}
 	if dpos.isDoubleMint(block) {
-		logger.Debug("DPoS: double-minting is detected.")
-		return false
+		logger.Warn("DPoS: double-minting is detected.")
+		//return false
 	}
 
 	dpos.AddBlockToSlot(block)
@@ -250,8 +249,8 @@ func (dpos *DPOS) IsProducingBlock() bool {
 func (dpos *DPOS) updateNewBlock(newBlock *core.Block) {
 	logger.WithFields(logger.Fields{
 		"peer_id": dpos.node.GetPeerID(),
-		"height": newBlock.GetHeight(),
-		"hash":   hex.EncodeToString(newBlock.GetHash()),
+		"height":  newBlock.GetHeight(),
+		"hash":    hex.EncodeToString(newBlock.GetHash()),
 	}).Info("DPoS: produced a new block.")
 	if !newBlock.VerifyHash() {
 		logger.Warn("DPoS: hash of the new block is invalid.")
