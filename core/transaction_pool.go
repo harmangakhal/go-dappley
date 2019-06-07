@@ -101,6 +101,13 @@ func (txPool *TransactionPool) GetNumOfTxInPool() int {
 	return len(txPool.txs)
 }
 
+func (txPool *TransactionPool) IsEmpty() bool {
+	txPool.mutex.RLock()
+	defer txPool.mutex.RUnlock()
+
+	return len(txPool.tipOrder) == 0
+}
+
 func (txPool *TransactionPool) ResetPendingTransactions() {
 	txPool.mutex.Lock()
 	defer txPool.mutex.Unlock()

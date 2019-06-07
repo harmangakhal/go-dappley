@@ -116,11 +116,11 @@ func (bp *BlockProducer) collectTransactions(utxoIndex *core.UTXOIndex, parentBl
 	rewards := make(map[string]string)
 	currBlkHeight := parentBlk.GetHeight() + 1
 
-	for totalSize < bp.bc.GetBlockSizeLimit() && bp.bc.GetTxPool().GetNumOfTxInPool() > 0 && !isExceedingDeadline(deadlineInMs) {
+	for totalSize < bp.bc.GetBlockSizeLimit() && !bp.bc.GetTxPool().IsEmpty() && !isExceedingDeadline(deadlineInMs) {
 
 		txNode := bp.bc.GetTxPool().PopTransactionWithMostTips(utxoIndex)
 		if txNode == nil {
-			break
+			continue
 		}
 		totalSize += txNode.Size
 
